@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Rock Paper Scissors vs AI</title>
+    <title>3D Rock Paper Scissors - Immersive Table</title>
     <style>
         * {
             margin: 0;
@@ -16,226 +16,78 @@
             overflow: hidden;
             background: #000;
             color: #fff;
+            cursor: crosshair;
         }
 
-        #canvas-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
-
-        #ui-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        #score-panel {
+        #info {
             position: absolute;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 20, 40, 0.8);
-            padding: 20px 40px;
-            border-radius: 15px;
-            border: 2px solid #00ffff;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
             text-align: center;
-        }
-
-        #score-panel h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #00ffff;
-            text-shadow: 0 0 10px #00ffff;
-        }
-
-        .score-row {
-            display: flex;
-            justify-content: space-around;
-            gap: 40px;
             font-size: 1.2em;
-            margin-top: 10px;
-        }
-
-        .score-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .score-label {
             color: #00ffff;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .score-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #fff;
             text-shadow: 0 0 10px #00ffff;
+            pointer-events: none;
+            z-index: 100;
         }
 
-        #controls {
+        #score {
             position: absolute;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 20px;
-            pointer-events: all;
-        }
-
-        .choice-btn {
-            width: 120px;
-            height: 120px;
-            background: rgba(0, 50, 100, 0.8);
-            border: 3px solid #00ffff;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .choice-btn:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
-            background: rgba(0, 100, 150, 0.9);
-        }
-
-        .choice-btn:active {
-            transform: translateY(-5px);
-        }
-
-        .choice-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .choice-btn:hover::before {
-            left: 100%;
-        }
-
-        .choice-label {
-            font-size: 0.3em;
-            margin-top: 5px;
+            gap: 40px;
+            font-size: 1.5em;
             color: #00ffff;
-            text-shadow: 0 0 5px #00ffff;
-        }
-
-        .choice-btn.disabled {
-            opacity: 0.5;
+            text-shadow: 0 0 10px #00ffff;
             pointer-events: none;
+            z-index: 100;
         }
 
-        #ai-dialogue {
-            position: absolute;
-            top: 120px;
-            right: 30px;
-            background: rgba(20, 0, 40, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #ff00ff;
-            max-width: 300px;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
-            animation: fadeIn 0.5s;
-            pointer-events: none;
+        .score-item {
+            text-align: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .score-label {
+            font-size: 0.6em;
+            opacity: 0.8;
         }
 
-        .ai-text {
-            color: #ff00ff;
-            font-size: 1.1em;
-            font-style: italic;
-            text-shadow: 0 0 5px #ff00ff;
+        .score-value {
+            font-size: 1.5em;
+            font-weight: bold;
         }
 
-        #result-display {
+        #result {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 40px 60px;
-            border-radius: 20px;
-            border: 3px solid #00ffff;
-            text-align: center;
-            font-size: 2em;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
-            display: none;
-            animation: popIn 0.5s;
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 0 0 20px currentColor;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
         }
 
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+        #result.show {
+            opacity: 1;
         }
 
-        .result-win {
+        #result.win {
             color: #00ff00;
-            text-shadow: 0 0 20px #00ff00;
         }
 
-        .result-lose {
+        #result.lose {
             color: #ff0000;
-            text-shadow: 0 0 20px #ff0000;
         }
 
-        .result-draw {
+        #result.draw {
             color: #ffff00;
-            text-shadow: 0 0 20px #ffff00;
-        }
-
-        #difficulty-panel {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 20, 40, 0.8);
-            padding: 15px 20px;
-            border-radius: 10px;
-            border: 2px solid #00ffff;
-            pointer-events: all;
-        }
-
-        #difficulty-panel h3 {
-            color: #00ffff;
-            font-size: 1em;
-            margin-bottom: 10px;
-        }
-
-        #difficulty-slider {
-            width: 200px;
-            cursor: pointer;
-        }
-
-        .difficulty-label {
-            color: #fff;
-            font-size: 0.9em;
-            margin-top: 5px;
-            text-align: center;
         }
 
         #start-screen {
@@ -261,16 +113,17 @@
         }
 
         .start-content h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 20px;
             color: #00ffff;
             text-shadow: 0 0 20px #00ffff;
         }
 
         .start-content p {
-            font-size: 1.2em;
+            font-size: 1.1em;
             margin: 15px 0;
             color: #fff;
+            line-height: 1.6;
         }
 
         #start-btn {
@@ -292,90 +145,56 @@
             transform: scale(1.05);
         }
 
-        .keyboard-hint {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #00ffff;
-            opacity: 0.7;
-        }
-
-        #round-indicator {
+        .hover-hint {
             position: absolute;
-            top: 50%;
+            bottom: 80px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4em;
+            transform: translateX(-50%);
+            font-size: 1em;
             color: #00ffff;
-            text-shadow: 0 0 30px #00ffff;
-            display: none;
-            animation: countdown 1s;
+            opacity: 0.6;
             pointer-events: none;
+            animation: pulse 2s infinite;
         }
 
-        @keyframes countdown {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-
-    <div id="ui-overlay">
-        <div id="start-screen">
-            <div class="start-content">
-                <h1>🤖 3D ROCK PAPER SCISSORS 🤖</h1>
-                <p>Face the AI in an epic holographic showdown!</p>
-                <p>Choose your weapon wisely...</p>
-                <button id="start-btn">START GAME</button>
-                <div class="keyboard-hint">Use 1, 2, 3 or click buttons to choose</div>
-            </div>
-        </div>
-
-        <div id="score-panel">
-            <h2>HOLOGRAPHIC ARENA</h2>
-            <div class="score-row">
-                <div class="score-item">
-                    <div class="score-label">PLAYER</div>
-                    <div class="score-value" id="player-score">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">DRAWS</div>
-                    <div class="score-value" id="draw-score">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">AI</div>
-                    <div class="score-value" id="ai-score">0</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="difficulty-panel">
-            <h3>AI DIFFICULTY</h3>
-            <input type="range" id="difficulty-slider" min="0" max="100" value="30">
-            <div class="difficulty-label" id="difficulty-label">Normal</div>
-        </div>
-
-        <div id="round-indicator">READY?</div>
-
-        <div id="result-display"></div>
-
-        <div id="controls">
-            <button class="choice-btn" data-choice="rock" id="rock-btn">
-                ✊
-                <div class="choice-label">ROCK</div>
-            </button>
-            <button class="choice-btn" data-choice="paper" id="paper-btn">
-                ✋
-                <div class="choice-label">PAPER</div>
-            </button>
-            <button class="choice-btn" data-choice="scissors" id="scissors-btn">
-                ✌️
-                <div class="choice-label">SCISSORS</div>
-            </button>
+    <div id="start-screen">
+        <div class="start-content">
+            <h1>🎮 3D ROCK PAPER SCISSORS 🎮</h1>
+            <p>An immersive tabletop experience</p>
+            <p>Click on your choice on the near side of the table</p>
+            <p>Rock, Paper, or Scissors</p>
+            <p>The AI will make its move on the far side</p>
+            <button id="start-btn">START GAME</button>
         </div>
     </div>
+
+    <div id="info">Click on your choice to play!</div>
+
+    <div id="score">
+        <div class="score-item">
+            <div class="score-label">YOU</div>
+            <div class="score-value" id="player-score">0</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">DRAWS</div>
+            <div class="score-value" id="draw-score">0</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">AI</div>
+            <div class="score-value" id="ai-score">0</div>
+        </div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="hover-hint">Hover over objects to highlight them</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -384,307 +203,470 @@
             playerScore: 0,
             aiScore: 0,
             drawScore: 0,
-            playerChoice: null,
-            aiChoice: null,
             isPlaying: false,
-            difficulty: 30,
-            playerHistory: [],
-            aiPersonality: 'confident'
-        };
-
-        // AI Dialogues
-        const aiDialogues = {
-            win: [
-                "Too easy! 😎",
-                "You thought I wouldn't see that coming?",
-                "My algorithms predicted this!",
-                "Victory is mine! 🤖",
-                "Humans are so predictable!",
-                "Better luck next time!",
-                "I am inevitable!"
-            ],
-            lose: [
-                "Impressive... for a human.",
-                "You got lucky this time!",
-                "How did you...?! 😤",
-                "Recalculating strategies...",
-                "This wasn't in my predictions!",
-                "Enjoy this rare victory!",
-                "I let you win. Obviously."
-            ],
-            draw: [
-                "Great minds think alike!",
-                "We're evenly matched!",
-                "Synchronization detected!",
-                "Again? Interesting...",
-                "The universe balanced itself.",
-                "A stalemate... for now."
-            ],
-            taunt: [
-                "Make your move, human!",
-                "I'm analyzing your patterns...",
-                "Ready to lose again?",
-                "Show me what you've got!",
-                "This will be interesting...",
-                "Choose wisely!"
-            ]
+            playerObjects: {},
+            aiObjects: {},
+            hoveredObject: null
         };
 
         // Three.js Setup
-        let scene, camera, renderer, playerSymbol, aiSymbol, aiCharacter;
-        let particles = [];
-        let animationId;
+        let scene, camera, renderer, raycaster, mouse;
+        let table, playerChoices = {}, aiChoices = {};
 
-        function initThreeJS() {
+        function init() {
             // Scene
             scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x000000, 10, 50);
+            scene.fog = new THREE.Fog(0x000510, 20, 60);
+            scene.background = new THREE.Color(0x000510);
 
             // Camera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 5, 15);
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 12, 18);
             camera.lookAt(0, 0, 0);
 
             // Renderer
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            document.body.appendChild(renderer.domElement);
+
+            // Raycaster for mouse picking
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
 
             // Lights
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
             scene.add(ambientLight);
 
-            const spotLight1 = new THREE.SpotLight(0x00ffff, 1);
-            spotLight1.position.set(-10, 15, 10);
-            spotLight1.castShadow = true;
-            spotLight1.angle = Math.PI / 6;
-            spotLight1.penumbra = 0.2;
-            scene.add(spotLight1);
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            mainLight.position.set(5, 15, 5);
+            mainLight.castShadow = true;
+            mainLight.shadow.camera.left = -15;
+            mainLight.shadow.camera.right = 15;
+            mainLight.shadow.camera.top = 15;
+            mainLight.shadow.camera.bottom = -15;
+            scene.add(mainLight);
 
-            const spotLight2 = new THREE.SpotLight(0xff00ff, 1);
-            spotLight2.position.set(10, 15, 10);
-            spotLight2.castShadow = true;
-            spotLight2.angle = Math.PI / 6;
-            spotLight2.penumbra = 0.2;
-            scene.add(spotLight2);
+            const fillLight1 = new THREE.PointLight(0x00ffff, 0.4, 30);
+            fillLight1.position.set(-8, 8, 8);
+            scene.add(fillLight1);
 
-            const backLight = new THREE.PointLight(0x00ffff, 0.5);
-            backLight.position.set(0, 5, -10);
-            scene.add(backLight);
+            const fillLight2 = new THREE.PointLight(0xff00ff, 0.4, 30);
+            fillLight2.position.set(8, 8, -8);
+            scene.add(fillLight2);
 
-            // Arena Platform
-            const platformGeometry = new THREE.CylinderGeometry(8, 8, 0.5, 32);
-            const platformMaterial = new THREE.MeshPhongMaterial({
-                color: 0x001a33,
-                emissive: 0x003366,
-                transparent: true,
-                opacity: 0.8,
-                shininess: 100
+            // Create table
+            createTable();
+
+            // Create player choices (near side)
+            createPlayerChoices();
+
+            // Create AI choices (far side)
+            createAIChoices();
+
+            // Create environment
+            createEnvironment();
+
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('click', onClick);
+
+            // Start animation
+            animate();
+        }
+
+        function createTable() {
+            // Table top
+            const topGeometry = new THREE.BoxGeometry(14, 0.5, 10);
+            const topMaterial = new THREE.MeshPhongMaterial({
+                color: 0x1a3050,
+                shininess: 60
             });
-            const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-            platform.position.y = -1;
-            platform.receiveShadow = true;
-            scene.add(platform);
+            const top = new THREE.Mesh(topGeometry, topMaterial);
+            top.position.y = 0;
+            top.receiveShadow = true;
+            scene.add(top);
 
-            // Platform Edge Glow
-            const edgeGeometry = new THREE.TorusGeometry(8, 0.1, 16, 100);
+            // Table edge glow
+            const edgeGeometry = new THREE.BoxGeometry(14.2, 0.6, 10.2);
             const edgeMaterial = new THREE.MeshBasicMaterial({
                 color: 0x00ffff,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.3,
+                wireframe: true
             });
             const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
-            edge.position.y = -0.75;
-            edge.rotation.x = Math.PI / 2;
+            edge.position.y = 0;
             scene.add(edge);
 
-            // Grid Lines
-            for (let i = -8; i <= 8; i += 2) {
-                const lineMaterial = new THREE.LineBasicMaterial({
-                    color: 0x00ffff,
-                    transparent: true,
-                    opacity: 0.2
-                });
-
-                const points1 = [
-                    new THREE.Vector3(i, -0.74, -8),
-                    new THREE.Vector3(i, -0.74, 8)
-                ];
-                const geometry1 = new THREE.BufferGeometry().setFromPoints(points1);
-                const line1 = new THREE.Line(geometry1, lineMaterial);
-                scene.add(line1);
-
-                const points2 = [
-                    new THREE.Vector3(-8, -0.74, i),
-                    new THREE.Vector3(8, -0.74, i)
-                ];
-                const geometry2 = new THREE.BufferGeometry().setFromPoints(points2);
-                const line2 = new THREE.Line(geometry2, lineMaterial);
-                scene.add(line2);
-            }
-
-            // AI Character (Glowing Sphere)
-            const aiGeometry = new THREE.SphereGeometry(1, 32, 32);
-            const aiMaterial = new THREE.MeshPhongMaterial({
-                color: 0xff00ff,
-                emissive: 0xff00ff,
-                emissiveIntensity: 0.5,
-                transparent: true,
-                opacity: 0.8,
-                shininess: 100
-            });
-            aiCharacter = new THREE.Mesh(aiGeometry, aiMaterial);
-            aiCharacter.position.set(0, 2, -6);
-            aiCharacter.castShadow = true;
-            scene.add(aiCharacter);
-
-            // AI Character Glow Ring
-            const ringGeometry = new THREE.TorusGeometry(1.3, 0.05, 16, 100);
-            const ringMaterial = new THREE.MeshBasicMaterial({
-                color: 0xff00ff,
-                transparent: true,
-                opacity: 0.6
-            });
-            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-            ring.rotation.x = Math.PI / 2;
-            aiCharacter.add(ring);
-
-            // Player Indicator
-            const playerGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-            const playerMaterial = new THREE.MeshPhongMaterial({
+            // Center line
+            const lineGeometry = new THREE.BoxGeometry(14, 0.05, 0.1);
+            const lineMaterial = new THREE.MeshBasicMaterial({
                 color: 0x00ffff,
-                emissive: 0x00ffff,
-                emissiveIntensity: 0.5,
                 transparent: true,
                 opacity: 0.6
             });
-            const playerIndicator = new THREE.Mesh(playerGeometry, playerMaterial);
-            playerIndicator.position.set(0, 1, 6);
-            scene.add(playerIndicator);
+            const line = new THREE.Mesh(lineGeometry, lineMaterial);
+            line.position.y = 0.3;
+            scene.add(line);
 
-            // Ambient Particles
-            createAmbientParticles();
-
-            // Window Resize
-            window.addEventListener('resize', onWindowResize);
+            table = top;
         }
 
-        function createAmbientParticles() {
+        function createRock(color) {
+            const geometry = new THREE.IcosahedronGeometry(1, 1);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.2,
+                shininess: 30,
+                flatShading: true
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            return mesh;
+        }
+
+        function createPaper(color) {
+            const geometry = new THREE.BoxGeometry(1.8, 0.05, 1.8);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.2,
+                shininess: 100
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.rotation.x = Math.PI * 0.1;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            return mesh;
+        }
+
+        function createScissors(color) {
+            const group = new THREE.Group();
+
+            const bladeGeometry = new THREE.ConeGeometry(0.15, 2, 4);
+            const bladeMaterial = new THREE.MeshPhongMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.2,
+                shininess: 100
+            });
+
+            const blade1 = new THREE.Mesh(bladeGeometry, bladeMaterial);
+            blade1.position.set(-0.4, 0.5, 0);
+            blade1.rotation.z = -0.4;
+            blade1.castShadow = true;
+
+            const blade2 = new THREE.Mesh(bladeGeometry, bladeMaterial);
+            blade2.position.set(0.4, 0.5, 0);
+            blade2.rotation.z = 0.4;
+            blade2.castShadow = true;
+
+            group.add(blade1);
+            group.add(blade2);
+
+            return group;
+        }
+
+        function createPlayerChoices() {
+            const playerColor = 0x00ffff;
+            const spacing = 4;
+            const yPos = 1;
+            const zPos = 4;
+
+            // Rock
+            const rock = createRock(playerColor);
+            rock.position.set(-spacing, yPos, zPos);
+            rock.userData = { type: 'rock', side: 'player', clickable: true };
+            scene.add(rock);
+            playerChoices.rock = rock;
+
+            // Paper
+            const paper = createPaper(playerColor);
+            paper.position.set(0, yPos, zPos);
+            paper.userData = { type: 'paper', side: 'player', clickable: true };
+            scene.add(paper);
+            playerChoices.paper = paper;
+
+            // Scissors
+            const scissors = createScissors(playerColor);
+            scissors.position.set(spacing, yPos, zPos);
+            scissors.userData = { type: 'scissors', side: 'player', clickable: true };
+            scene.add(scissors);
+            playerChoices.scissors = scissors;
+        }
+
+        function createAIChoices() {
+            const aiColor = 0xff00ff;
+            const spacing = 4;
+            const yPos = 1;
+            const zPos = -4;
+
+            // Rock
+            const rock = createRock(aiColor);
+            rock.position.set(-spacing, yPos, zPos);
+            rock.scale.set(0.7, 0.7, 0.7);
+            rock.userData = { type: 'rock', side: 'ai' };
+            rock.visible = false;
+            scene.add(rock);
+            aiChoices.rock = rock;
+
+            // Paper
+            const paper = createPaper(aiColor);
+            paper.position.set(0, yPos, zPos);
+            paper.scale.set(0.7, 0.7, 0.7);
+            paper.userData = { type: 'paper', side: 'ai' };
+            paper.visible = false;
+            scene.add(paper);
+            aiChoices.paper = paper;
+
+            // Scissors
+            const scissors = createScissors(aiColor);
+            scissors.position.set(spacing, yPos, zPos);
+            scissors.scale.set(0.7, 0.7, 0.7);
+            scissors.userData = { type: 'scissors', side: 'ai' };
+            scissors.visible = false;
+            scene.add(scissors);
+            aiChoices.scissors = scissors;
+        }
+
+        function createEnvironment() {
+            // Floor
+            const floorGeometry = new THREE.PlaneGeometry(50, 50);
+            const floorMaterial = new THREE.MeshPhongMaterial({
+                color: 0x001020,
+                shininess: 80
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -3;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Ambient particles
             const particleGeometry = new THREE.BufferGeometry();
-            const particleCount = 200;
+            const particleCount = 100;
             const positions = new Float32Array(particleCount * 3);
 
             for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 30;
-                positions[i + 1] = Math.random() * 20 - 5;
-                positions[i + 2] = (Math.random() - 0.5) * 30;
+                positions[i] = (Math.random() - 0.5) * 40;
+                positions[i + 1] = Math.random() * 30;
+                positions[i + 2] = (Math.random() - 0.5) * 40;
             }
 
             particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
             const particleMaterial = new THREE.PointsMaterial({
                 color: 0x00ffff,
-                size: 0.1,
+                size: 0.15,
                 transparent: true,
-                opacity: 0.6
+                opacity: 0.4
             });
 
-            const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particleSystem);
-            particles.push(particleSystem);
+            const particles = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particles);
         }
 
-        function createSymbol(choice, position, isPlayer) {
-            // Remove old symbol
-            if (isPlayer && playerSymbol) {
-                scene.remove(playerSymbol);
-            } else if (!isPlayer && aiSymbol) {
-                scene.remove(aiSymbol);
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Check for hover
+            raycaster.setFromCamera(mouse, camera);
+            const clickableObjects = Object.values(playerChoices);
+            const intersects = raycaster.intersectObjects(clickableObjects, true);
+
+            // Reset previous hover
+            if (gameState.hoveredObject && !gameState.isPlaying) {
+                resetObjectScale(gameState.hoveredObject);
+                gameState.hoveredObject.traverse(child => {
+                    if (child.material) {
+                        child.material.emissiveIntensity = 0.2;
+                    }
+                });
+                gameState.hoveredObject = null;
             }
 
-            let geometry, material, symbol;
-            const color = isPlayer ? 0x00ffff : 0xff00ff;
+            if (intersects.length > 0 && !gameState.isPlaying) {
+                let object = intersects[0].object;
+                while (object.parent && !object.userData.clickable) {
+                    object = object.parent;
+                }
 
-            switch(choice) {
-                case 'rock':
-                    geometry = new THREE.IcosahedronGeometry(1, 0);
-                    material = new THREE.MeshPhongMaterial({
-                        color: color,
-                        emissive: color,
-                        emissiveIntensity: 0.3,
-                        shininess: 50,
-                        flatShading: true
+                if (object.userData.clickable) {
+                    gameState.hoveredObject = object;
+                    object.scale.set(1.2, 1.2, 1.2);
+                    object.traverse(child => {
+                        if (child.material) {
+                            child.material.emissiveIntensity = 0.6;
+                        }
                     });
-                    symbol = new THREE.Mesh(geometry, material);
-                    break;
-
-                case 'paper':
-                    geometry = new THREE.PlaneGeometry(2, 2);
-                    material = new THREE.MeshPhongMaterial({
-                        color: color,
-                        emissive: color,
-                        emissiveIntensity: 0.3,
-                        side: THREE.DoubleSide,
-                        shininess: 100
-                    });
-                    symbol = new THREE.Mesh(geometry, material);
-                    break;
-
-                case 'scissors':
-                    const scissorsGroup = new THREE.Group();
-
-                    const blade1Geometry = new THREE.ConeGeometry(0.2, 2, 4);
-                    const blade1Material = new THREE.MeshPhongMaterial({
-                        color: color,
-                        emissive: color,
-                        emissiveIntensity: 0.3,
-                        shininess: 100
-                    });
-                    const blade1 = new THREE.Mesh(blade1Geometry, blade1Material);
-                    blade1.position.set(-0.3, 0, 0);
-                    blade1.rotation.z = -0.3;
-
-                    const blade2 = blade1.clone();
-                    blade2.position.set(0.3, 0, 0);
-                    blade2.rotation.z = 0.3;
-
-                    scissorsGroup.add(blade1);
-                    scissorsGroup.add(blade2);
-                    symbol = scissorsGroup;
-                    break;
+                    document.body.style.cursor = 'pointer';
+                    return;
+                }
             }
 
-            symbol.position.copy(position);
-            symbol.castShadow = true;
-            symbol.receiveShadow = true;
-            scene.add(symbol);
+            document.body.style.cursor = gameState.isPlaying ? 'wait' : 'crosshair';
+        }
 
-            if (isPlayer) {
-                playerSymbol = symbol;
+        function onClick(event) {
+            if (gameState.isPlaying) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const clickableObjects = Object.values(playerChoices);
+            const intersects = raycaster.intersectObjects(clickableObjects, true);
+
+            if (intersects.length > 0) {
+                let object = intersects[0].object;
+                while (object.parent && !object.userData.clickable) {
+                    object = object.parent;
+                }
+
+                if (object.userData.clickable) {
+                    playRound(object.userData.type);
+                }
+            }
+        }
+
+        function playRound(playerChoice) {
+            gameState.isPlaying = true;
+            document.getElementById('info').textContent = 'AI is choosing...';
+
+            // Highlight player choice
+            highlightChoice(playerChoices[playerChoice], true);
+
+            // Dim other player choices
+            Object.entries(playerChoices).forEach(([type, obj]) => {
+                if (type !== playerChoice) {
+                    dimObject(obj);
+                }
+            });
+
+            setTimeout(() => {
+                // AI makes choice
+                const choices = ['rock', 'paper', 'scissors'];
+                const aiChoice = choices[Math.floor(Math.random() * choices.length)];
+
+                // Show AI choice
+                aiChoices[aiChoice].visible = true;
+                highlightChoice(aiChoices[aiChoice], false);
+
+                // Animate AI choice appearing
+                aiChoices[aiChoice].scale.set(0, 0, 0);
+                animateScale(aiChoices[aiChoice], 0.7, 500);
+
+                setTimeout(() => {
+                    // Determine winner
+                    const result = determineWinner(playerChoice, aiChoice);
+                    handleResult(result, playerChoice, aiChoice);
+                }, 800);
+            }, 1500);
+        }
+
+        function determineWinner(player, ai) {
+            if (player === ai) return 'draw';
+            if (
+                (player === 'rock' && ai === 'scissors') ||
+                (player === 'paper' && ai === 'rock') ||
+                (player === 'scissors' && ai === 'paper')
+            ) {
+                return 'player';
+            }
+            return 'ai';
+        }
+
+        function handleResult(result, playerChoice, aiChoice) {
+            const resultEl = document.getElementById('result');
+
+            if (result === 'player') {
+                resultEl.textContent = 'YOU WIN!';
+                resultEl.className = 'show win';
+                gameState.playerScore++;
+                createExplosion(playerChoices[playerChoice].position, 0x00ff00);
+                shakeObject(aiChoices[aiChoice]);
+            } else if (result === 'ai') {
+                resultEl.textContent = 'AI WINS!';
+                resultEl.className = 'show lose';
+                gameState.aiScore++;
+                createExplosion(aiChoices[aiChoice].position, 0xff0000);
+                shakeObject(playerChoices[playerChoice]);
             } else {
-                aiSymbol = symbol;
+                resultEl.textContent = 'DRAW!';
+                resultEl.className = 'show draw';
+                gameState.drawScore++;
+                createExplosion(new THREE.Vector3(0, 2, 0), 0xffff00);
             }
 
-            // Spawn animation
-            symbol.scale.set(0, 0, 0);
-            animateSymbolSpawn(symbol);
+            updateScore();
 
-            return symbol;
+            setTimeout(() => {
+                resultEl.className = '';
+                resetRound();
+            }, 2500);
         }
 
-        function animateSymbolSpawn(symbol) {
+        function resetRound() {
+            // Hide AI choices
+            Object.values(aiChoices).forEach(obj => {
+                obj.visible = false;
+            });
+
+            // Reset player choices
+            Object.values(playerChoices).forEach(obj => {
+                resetObjectScale(obj);
+                obj.traverse(child => {
+                    if (child.material) {
+                        child.material.emissiveIntensity = 0.2;
+                        child.material.opacity = 1;
+                    }
+                });
+            });
+
+            gameState.isPlaying = false;
+            document.getElementById('info').textContent = 'Click on your choice to play!';
+        }
+
+        function highlightChoice(object, isPlayer) {
+            object.traverse(child => {
+                if (child.material) {
+                    child.material.emissiveIntensity = 0.8;
+                }
+            });
+        }
+
+        function dimObject(object) {
+            object.traverse(child => {
+                if (child.material) {
+                    child.material.emissiveIntensity = 0.05;
+                    child.material.opacity = 0.3;
+                    child.material.transparent = true;
+                }
+            });
+        }
+
+        function resetObjectScale(object) {
+            if (object.userData.side === 'player') {
+                object.scale.set(1, 1, 1);
+            } else {
+                object.scale.set(0.7, 0.7, 0.7);
+            }
+        }
+
+        function animateScale(object, targetScale, duration) {
+            const startScale = 0;
             const startTime = Date.now();
-            const duration = 500;
 
             function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
 
-                const scale = progress * 1;
-                symbol.scale.set(scale, scale, scale);
-                symbol.rotation.y = progress * Math.PI * 2;
+                const scale = startScale + (targetScale - startScale) * eased;
+                object.scale.set(scale, scale, scale);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
@@ -694,65 +676,77 @@
             animate();
         }
 
-        function createWinParticles(position, color) {
-            const particleCount = 50;
-            const particleGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const velocities = [];
-
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = position.x;
-                positions[i + 1] = position.y;
-                positions[i + 2] = position.z;
-
-                velocities.push({
-                    x: (Math.random() - 0.5) * 0.2,
-                    y: Math.random() * 0.2,
-                    z: (Math.random() - 0.5) * 0.2
-                });
-            }
-
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const particleMaterial = new THREE.PointsMaterial({
-                color: color,
-                size: 0.3,
-                transparent: true,
-                opacity: 1
-            });
-
-            const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particleSystem);
-
-            // Animate particles
+        function shakeObject(object) {
+            const originalPos = object.position.clone();
             const startTime = Date.now();
-            const duration = 2000;
+            const duration = 500;
+            const intensity = 0.2;
 
-            function animateParticles() {
+            function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = elapsed / duration;
 
                 if (progress < 1) {
-                    const positions = particleSystem.geometry.attributes.position.array;
-
-                    for (let i = 0; i < particleCount; i++) {
-                        positions[i * 3] += velocities[i].x;
-                        positions[i * 3 + 1] += velocities[i].y;
-                        positions[i * 3 + 2] += velocities[i].z;
-
-                        velocities[i].y -= 0.002; // Gravity
-                    }
-
-                    particleSystem.geometry.attributes.position.needsUpdate = true;
-                    particleMaterial.opacity = 1 - progress;
-
-                    requestAnimationFrame(animateParticles);
+                    const shakeX = (Math.random() - 0.5) * intensity * (1 - progress);
+                    const shakeZ = (Math.random() - 0.5) * intensity * (1 - progress);
+                    object.position.x = originalPos.x + shakeX;
+                    object.position.z = originalPos.z + shakeZ;
+                    requestAnimationFrame(animate);
                 } else {
-                    scene.remove(particleSystem);
+                    object.position.copy(originalPos);
                 }
             }
 
-            animateParticles();
+            animate();
+        }
+
+        function createExplosion(position, color) {
+            const particleCount = 30;
+            const particles = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const material = new THREE.MeshBasicMaterial({ color: color });
+                const particle = new THREE.Mesh(geometry, material);
+
+                particle.position.copy(position);
+                particle.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.3,
+                    Math.random() * 0.3,
+                    (Math.random() - 0.5) * 0.3
+                );
+
+                scene.add(particle);
+                particles.push(particle);
+            }
+
+            const startTime = Date.now();
+            const duration = 1000;
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+
+                if (progress < 1) {
+                    particles.forEach(p => {
+                        p.position.add(p.userData.velocity);
+                        p.userData.velocity.y -= 0.01; // Gravity
+                        p.material.opacity = 1 - progress;
+                        p.material.transparent = true;
+                    });
+                    requestAnimationFrame(animate);
+                } else {
+                    particles.forEach(p => scene.remove(p));
+                }
+            }
+
+            animate();
+        }
+
+        function updateScore() {
+            document.getElementById('player-score').textContent = gameState.playerScore;
+            document.getElementById('ai-score').textContent = gameState.aiScore;
+            document.getElementById('draw-score').textContent = gameState.drawScore;
         }
 
         function onWindowResize() {
@@ -762,344 +756,25 @@
         }
 
         function animate() {
-            animationId = requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
 
-            // Rotate AI character
-            if (aiCharacter) {
-                aiCharacter.rotation.y += 0.01;
-                aiCharacter.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.2;
+            // Gentle rotation of objects when not playing
+            if (!gameState.isPlaying) {
+                Object.values(playerChoices).forEach(obj => {
+                    obj.rotation.y += 0.005;
+                });
             }
-
-            // Rotate symbols
-            if (playerSymbol) {
-                playerSymbol.rotation.y += 0.02;
-            }
-            if (aiSymbol) {
-                aiSymbol.rotation.y += 0.02;
-            }
-
-            // Animate ambient particles
-            particles.forEach(p => {
-                p.rotation.y += 0.001;
-            });
 
             renderer.render(scene, camera);
         }
 
-        // Game Logic
-        function determineWinner(playerChoice, aiChoice) {
-            if (playerChoice === aiChoice) return 'draw';
-
-            if (
-                (playerChoice === 'rock' && aiChoice === 'scissors') ||
-                (playerChoice === 'paper' && aiChoice === 'rock') ||
-                (playerChoice === 'scissors' && aiChoice === 'paper')
-            ) {
-                return 'player';
-            }
-
-            return 'ai';
-        }
-
-        function getSmartAIChoice() {
-            const difficulty = gameState.difficulty;
-            const random = Math.random() * 100;
-
-            // Below difficulty, AI plays randomly
-            if (random > difficulty) {
-                return getRandomChoice();
-            }
-
-            // Smart AI based on player history
-            if (gameState.playerHistory.length < 2) {
-                return getRandomChoice();
-            }
-
-            // Pattern detection - counter the most common player move
-            const recentHistory = gameState.playerHistory.slice(-5);
-            const counts = { rock: 0, paper: 0, scissors: 0 };
-
-            recentHistory.forEach(choice => {
-                counts[choice]++;
-            });
-
-            let predictedPlayerMove = Object.keys(counts).reduce((a, b) =>
-                counts[a] > counts[b] ? a : b
-            );
-
-            // Counter the predicted move
-            return counterMove(predictedPlayerMove);
-        }
-
-        function counterMove(move) {
-            const counters = {
-                rock: 'paper',
-                paper: 'scissors',
-                scissors: 'rock'
-            };
-            return counters[move];
-        }
-
-        function getRandomChoice() {
-            const choices = ['rock', 'paper', 'scissors'];
-            return choices[Math.floor(Math.random() * choices.length)];
-        }
-
-        function showAIDialogue(type) {
-            const existingDialogue = document.getElementById('ai-dialogue');
-            if (existingDialogue) {
-                existingDialogue.remove();
-            }
-
-            const dialogue = document.createElement('div');
-            dialogue.id = 'ai-dialogue';
-            dialogue.innerHTML = `<div class="ai-text">${getRandomDialogue(type)}</div>`;
-            document.getElementById('ui-overlay').appendChild(dialogue);
-
-            setTimeout(() => {
-                dialogue.remove();
-            }, 3000);
-        }
-
-        function getRandomDialogue(type) {
-            const dialogues = aiDialogues[type];
-            return dialogues[Math.floor(Math.random() * dialogues.length)];
-        }
-
-        function playRound(playerChoice) {
-            if (gameState.isPlaying) return;
-
-            gameState.isPlaying = true;
-            gameState.playerChoice = playerChoice;
-            gameState.playerHistory.push(playerChoice);
-
-            // Keep only last 10 moves
-            if (gameState.playerHistory.length > 10) {
-                gameState.playerHistory.shift();
-            }
-
-            // Disable buttons
-            document.querySelectorAll('.choice-btn').forEach(btn => {
-                btn.classList.add('disabled');
-            });
-
-            // Show countdown
-            showCountdown();
-
-            // AI makes choice after delay
-            setTimeout(() => {
-                gameState.aiChoice = getSmartAIChoice();
-
-                // Create symbols
-                createSymbol(playerChoice, new THREE.Vector3(0, 2, 4), true);
-                createSymbol(gameState.aiChoice, new THREE.Vector3(0, 2, -4), false);
-
-                // Camera zoom
-                animateCamera();
-
-                // Determine winner after animation
-                setTimeout(() => {
-                    const result = determineWinner(playerChoice, gameState.aiChoice);
-                    handleResult(result);
-                }, 1500);
-            }, 1500);
-        }
-
-        function showCountdown() {
-            const indicator = document.getElementById('round-indicator');
-            const messages = ['3', '2', '1', 'SHOOT!'];
-            let index = 0;
-
-            function showNext() {
-                if (index < messages.length) {
-                    indicator.textContent = messages[index];
-                    indicator.style.display = 'block';
-
-                    setTimeout(() => {
-                        indicator.style.display = 'none';
-                        index++;
-                        setTimeout(showNext, 100);
-                    }, 400);
-                }
-            }
-
-            showNext();
-        }
-
-        function animateCamera() {
-            const startZ = camera.position.z;
-            const targetZ = 12;
-            const startTime = Date.now();
-            const duration = 1000;
-
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-
-                camera.position.z = startZ + (targetZ - startZ) * progress;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    // Zoom back
-                    setTimeout(() => {
-                        const backStart = Date.now();
-                        function zoomBack() {
-                            const elapsed = Date.now() - backStart;
-                            const progress = Math.min(elapsed / duration, 1);
-
-                            camera.position.z = targetZ + (startZ - targetZ) * progress;
-
-                            if (progress < 1) {
-                                requestAnimationFrame(zoomBack);
-                            }
-                        }
-                        zoomBack();
-                    }, 500);
-                }
-            }
-
-            animate();
-        }
-
-        function handleResult(result) {
-            const resultDisplay = document.getElementById('result-display');
-
-            let message = '';
-            let className = '';
-            let dialogueType = '';
-            let particleColor = 0xffffff;
-
-            if (result === 'player') {
-                message = '🎉 YOU WIN! 🎉';
-                className = 'result-win';
-                dialogueType = 'lose';
-                gameState.playerScore++;
-                particleColor = 0x00ff00;
-
-                // Change AI color to show defeat
-                aiCharacter.material.color.setHex(0xff0000);
-                aiCharacter.material.emissive.setHex(0xff0000);
-
-                createWinParticles(new THREE.Vector3(0, 2, 4), particleColor);
-            } else if (result === 'ai') {
-                message = '😢 AI WINS! 😢';
-                className = 'result-lose';
-                dialogueType = 'win';
-                gameState.aiScore++;
-                particleColor = 0xff0000;
-
-                // Change AI color to show victory
-                aiCharacter.material.color.setHex(0x00ff00);
-                aiCharacter.material.emissive.setHex(0x00ff00);
-
-                createWinParticles(new THREE.Vector3(0, 2, -4), particleColor);
-            } else {
-                message = '🤝 DRAW! 🤝';
-                className = 'result-draw';
-                dialogueType = 'draw';
-                gameState.drawScore++;
-                particleColor = 0xffff00;
-
-                createWinParticles(new THREE.Vector3(0, 2, 0), particleColor);
-            }
-
-            resultDisplay.textContent = message;
-            resultDisplay.className = className;
-            resultDisplay.style.display = 'block';
-
-            // Show AI dialogue
-            showAIDialogue(dialogueType);
-
-            // Update score
-            updateScore();
-
-            // Reset for next round
-            setTimeout(() => {
-                resultDisplay.style.display = 'none';
-                gameState.isPlaying = false;
-
-                // Reset AI color
-                aiCharacter.material.color.setHex(0xff00ff);
-                aiCharacter.material.emissive.setHex(0xff00ff);
-
-                // Enable buttons
-                document.querySelectorAll('.choice-btn').forEach(btn => {
-                    btn.classList.remove('disabled');
-                });
-
-                // Show taunt
-                showAIDialogue('taunt');
-
-                // Remove symbols
-                if (playerSymbol) {
-                    scene.remove(playerSymbol);
-                    playerSymbol = null;
-                }
-                if (aiSymbol) {
-                    scene.remove(aiSymbol);
-                    aiSymbol = null;
-                }
-            }, 3000);
-        }
-
-        function updateScore() {
-            document.getElementById('player-score').textContent = gameState.playerScore;
-            document.getElementById('ai-score').textContent = gameState.aiScore;
-            document.getElementById('draw-score').textContent = gameState.drawScore;
-        }
-
-        // UI Event Listeners
+        // Start button
         document.getElementById('start-btn').addEventListener('click', () => {
             document.getElementById('start-screen').style.display = 'none';
-            showAIDialogue('taunt');
-        });
-
-        document.querySelectorAll('.choice-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const choice = btn.getAttribute('data-choice');
-                playRound(choice);
-            });
-        });
-
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            if (gameState.isPlaying) return;
-            if (document.getElementById('start-screen').style.display !== 'none') return;
-
-            switch(e.key) {
-                case '1':
-                    playRound('rock');
-                    break;
-                case '2':
-                    playRound('paper');
-                    break;
-                case '3':
-                    playRound('scissors');
-                    break;
-            }
-        });
-
-        // Difficulty slider
-        const difficultySlider = document.getElementById('difficulty-slider');
-        const difficultyLabel = document.getElementById('difficulty-label');
-
-        difficultySlider.addEventListener('input', (e) => {
-            gameState.difficulty = parseInt(e.target.value);
-
-            let label = 'Easy';
-            if (gameState.difficulty > 60) {
-                label = 'Expert';
-            } else if (gameState.difficulty > 30) {
-                label = 'Hard';
-            }
-
-            difficultyLabel.textContent = label;
         });
 
         // Initialize
-        initThreeJS();
-        animate();
+        init();
     </script>
 </body>
 </html>
