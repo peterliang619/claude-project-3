@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Rock Paper Scissors - Immersive Table</title>
+    <title>Rock Paper Scissors</title>
     <style>
         * {
             margin: 0;
@@ -12,38 +12,26 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden;
-            background: #000;
-            color: #fff;
-            cursor: crosshair;
-        }
-
-        #info {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            font-size: 1.2em;
-            color: #00ffff;
-            text-shadow: 0 0 10px #00ffff;
-            pointer-events: none;
-            z-index: 100;
+            background: #f5f5f5;
+            color: #333;
+            cursor: default;
         }
 
         #score {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 40px;
-            font-size: 1.5em;
-            color: #00ffff;
-            text-shadow: 0 0 10px #00ffff;
+            gap: 60px;
+            font-size: 1.2em;
+            color: #333;
             pointer-events: none;
             z-index: 100;
+            font-weight: 300;
+            letter-spacing: 2px;
         }
 
         .score-item {
@@ -51,13 +39,15 @@
         }
 
         .score-label {
-            font-size: 0.6em;
-            opacity: 0.8;
+            font-size: 0.7em;
+            opacity: 0.5;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .score-value {
-            font-size: 1.5em;
-            font-weight: bold;
+            font-size: 2em;
+            font-weight: 200;
         }
 
         #result {
@@ -65,13 +55,14 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 3em;
-            font-weight: bold;
-            text-shadow: 0 0 20px currentColor;
+            font-size: 2em;
+            font-weight: 200;
+            letter-spacing: 4px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 100;
+            text-transform: uppercase;
         }
 
         #result.show {
@@ -79,111 +70,26 @@
         }
 
         #result.win {
-            color: #00ff00;
+            color: #333;
         }
 
         #result.lose {
-            color: #ff0000;
+            color: #999;
         }
 
         #result.draw {
-            color: #ffff00;
-        }
-
-        #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .start-content {
-            text-align: center;
-            padding: 40px;
-            background: rgba(0, 50, 100, 0.5);
-            border: 3px solid #00ffff;
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-        }
-
-        .start-content h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #00ffff;
-            text-shadow: 0 0 20px #00ffff;
-        }
-
-        .start-content p {
-            font-size: 1.1em;
-            margin: 15px 0;
-            color: #fff;
-            line-height: 1.6;
-        }
-
-        #start-btn {
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 1.5em;
-            background: rgba(0, 100, 150, 0.8);
-            border: 3px solid #00ffff;
-            border-radius: 10px;
-            color: #00ffff;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        }
-
-        #start-btn:hover {
-            background: rgba(0, 150, 200, 0.9);
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
-            transform: scale(1.05);
-        }
-
-        .hover-hint {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1em;
-            color: #00ffff;
-            opacity: 0.6;
-            pointer-events: none;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div id="start-screen">
-        <div class="start-content">
-            <h1>🎮 3D ROCK PAPER SCISSORS 🎮</h1>
-            <p>An immersive tabletop experience</p>
-            <p>Click on your choice on the near side of the table</p>
-            <p>Rock, Paper, or Scissors</p>
-            <p>The AI will make its move on the far side</p>
-            <button id="start-btn">START GAME</button>
-        </div>
-    </div>
-
-    <div id="info">Click on your choice to play!</div>
-
     <div id="score">
         <div class="score-item">
-            <div class="score-label">YOU</div>
+            <div class="score-label">You</div>
             <div class="score-value" id="player-score">0</div>
         </div>
         <div class="score-item">
-            <div class="score-label">DRAWS</div>
+            <div class="score-label">Draw</div>
             <div class="score-value" id="draw-score">0</div>
         </div>
         <div class="score-item">
@@ -194,8 +100,6 @@
 
     <div id="result"></div>
 
-    <div class="hover-hint">Hover over objects to highlight them</div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Game State
@@ -204,24 +108,21 @@
             aiScore: 0,
             drawScore: 0,
             isPlaying: false,
-            playerObjects: {},
-            aiObjects: {},
             hoveredObject: null
         };
 
         // Three.js Setup
         let scene, camera, renderer, raycaster, mouse;
-        let table, playerChoices = {}, aiChoices = {};
+        let playerChoices = {}, aiChoices = {};
 
         function init() {
             // Scene
             scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x000510, 20, 60);
-            scene.background = new THREE.Color(0x000510);
+            scene.background = new THREE.Color(0xf5f5f5);
 
             // Camera
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 12, 18);
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 14, 20);
             camera.lookAt(0, 0, 0);
 
             // Renderer
@@ -231,42 +132,36 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
 
-            // Raycaster for mouse picking
+            // Raycaster
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
 
             // Lights
-            const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
 
-            const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            mainLight.position.set(5, 15, 5);
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            mainLight.position.set(8, 15, 8);
             mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
             mainLight.shadow.camera.left = -15;
             mainLight.shadow.camera.right = 15;
             mainLight.shadow.camera.top = 15;
             mainLight.shadow.camera.bottom = -15;
             scene.add(mainLight);
 
-            const fillLight1 = new THREE.PointLight(0x00ffff, 0.4, 30);
-            fillLight1.position.set(-8, 8, 8);
-            scene.add(fillLight1);
-
-            const fillLight2 = new THREE.PointLight(0xff00ff, 0.4, 30);
-            fillLight2.position.set(8, 8, -8);
-            scene.add(fillLight2);
-
             // Create table
             createTable();
 
-            // Create player choices (near side)
+            // Create player choices
             createPlayerChoices();
 
-            // Create AI choices (far side)
+            // Create AI choices
             createAIChoices();
 
-            // Create environment
-            createEnvironment();
+            // Create floor
+            createFloor();
 
             // Event listeners
             window.addEventListener('resize', onWindowResize);
@@ -278,50 +173,31 @@
         }
 
         function createTable() {
-            // Table top
-            const topGeometry = new THREE.BoxGeometry(14, 0.5, 10);
-            const topMaterial = new THREE.MeshPhongMaterial({
-                color: 0x1a3050,
-                shininess: 60
+            // Simple table top
+            const topGeometry = new THREE.BoxGeometry(16, 0.3, 12);
+            const topMaterial = new THREE.MeshLambertMaterial({
+                color: 0xffffff
             });
             const top = new THREE.Mesh(topGeometry, topMaterial);
             top.position.y = 0;
+            top.castShadow = true;
             top.receiveShadow = true;
             scene.add(top);
 
-            // Table edge glow
-            const edgeGeometry = new THREE.BoxGeometry(14.2, 0.6, 10.2);
-            const edgeMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                transparent: true,
-                opacity: 0.3,
-                wireframe: true
-            });
-            const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
-            edge.position.y = 0;
-            scene.add(edge);
-
-            // Center line
-            const lineGeometry = new THREE.BoxGeometry(14, 0.05, 0.1);
+            // Thin center line
+            const lineGeometry = new THREE.BoxGeometry(16, 0.02, 0.02);
             const lineMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                transparent: true,
-                opacity: 0.6
+                color: 0xdddddd
             });
             const line = new THREE.Mesh(lineGeometry, lineMaterial);
-            line.position.y = 0.3;
+            line.position.y = 0.2;
             scene.add(line);
-
-            table = top;
         }
 
         function createRock(color) {
-            const geometry = new THREE.IcosahedronGeometry(1, 1);
-            const material = new THREE.MeshPhongMaterial({
+            const geometry = new THREE.IcosahedronGeometry(0.8, 0);
+            const material = new THREE.MeshLambertMaterial({
                 color: color,
-                emissive: color,
-                emissiveIntensity: 0.2,
-                shininess: 30,
                 flatShading: true
             });
             const mesh = new THREE.Mesh(geometry, material);
@@ -331,15 +207,12 @@
         }
 
         function createPaper(color) {
-            const geometry = new THREE.BoxGeometry(1.8, 0.05, 1.8);
-            const material = new THREE.MeshPhongMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.2,
-                shininess: 100
+            const geometry = new THREE.BoxGeometry(1.4, 0.02, 1.4);
+            const material = new THREE.MeshLambertMaterial({
+                color: color
             });
             const mesh = new THREE.Mesh(geometry, material);
-            mesh.rotation.x = Math.PI * 0.1;
+            mesh.rotation.x = Math.PI * 0.05;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             return mesh;
@@ -348,22 +221,19 @@
         function createScissors(color) {
             const group = new THREE.Group();
 
-            const bladeGeometry = new THREE.ConeGeometry(0.15, 2, 4);
-            const bladeMaterial = new THREE.MeshPhongMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.2,
-                shininess: 100
+            const bladeGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.5, 8);
+            const bladeMaterial = new THREE.MeshLambertMaterial({
+                color: color
             });
 
             const blade1 = new THREE.Mesh(bladeGeometry, bladeMaterial);
-            blade1.position.set(-0.4, 0.5, 0);
-            blade1.rotation.z = -0.4;
+            blade1.position.set(-0.3, 0.5, 0);
+            blade1.rotation.z = -0.3;
             blade1.castShadow = true;
 
             const blade2 = new THREE.Mesh(bladeGeometry, bladeMaterial);
-            blade2.position.set(0.4, 0.5, 0);
-            blade2.rotation.z = 0.4;
+            blade2.position.set(0.3, 0.5, 0);
+            blade2.rotation.z = 0.3;
             blade2.castShadow = true;
 
             group.add(blade1);
@@ -373,10 +243,10 @@
         }
 
         function createPlayerChoices() {
-            const playerColor = 0x00ffff;
-            const spacing = 4;
-            const yPos = 1;
-            const zPos = 4;
+            const playerColor = 0x333333;
+            const spacing = 4.5;
+            const yPos = 0.8;
+            const zPos = 4.5;
 
             // Rock
             const rock = createRock(playerColor);
@@ -401,15 +271,15 @@
         }
 
         function createAIChoices() {
-            const aiColor = 0xff00ff;
-            const spacing = 4;
-            const yPos = 1;
-            const zPos = -4;
+            const aiColor = 0x999999;
+            const spacing = 4.5;
+            const yPos = 0.8;
+            const zPos = -4.5;
 
             // Rock
             const rock = createRock(aiColor);
             rock.position.set(-spacing, yPos, zPos);
-            rock.scale.set(0.7, 0.7, 0.7);
+            rock.scale.set(0.8, 0.8, 0.8);
             rock.userData = { type: 'rock', side: 'ai' };
             rock.visible = false;
             scene.add(rock);
@@ -418,7 +288,7 @@
             // Paper
             const paper = createPaper(aiColor);
             paper.position.set(0, yPos, zPos);
-            paper.scale.set(0.7, 0.7, 0.7);
+            paper.scale.set(0.8, 0.8, 0.8);
             paper.userData = { type: 'paper', side: 'ai' };
             paper.visible = false;
             scene.add(paper);
@@ -427,48 +297,23 @@
             // Scissors
             const scissors = createScissors(aiColor);
             scissors.position.set(spacing, yPos, zPos);
-            scissors.scale.set(0.7, 0.7, 0.7);
+            scissors.scale.set(0.8, 0.8, 0.8);
             scissors.userData = { type: 'scissors', side: 'ai' };
             scissors.visible = false;
             scene.add(scissors);
             aiChoices.scissors = scissors;
         }
 
-        function createEnvironment() {
-            // Floor
-            const floorGeometry = new THREE.PlaneGeometry(50, 50);
-            const floorMaterial = new THREE.MeshPhongMaterial({
-                color: 0x001020,
-                shininess: 80
+        function createFloor() {
+            const floorGeometry = new THREE.PlaneGeometry(100, 100);
+            const floorMaterial = new THREE.MeshLambertMaterial({
+                color: 0xf5f5f5
             });
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
             floor.rotation.x = -Math.PI / 2;
-            floor.position.y = -3;
+            floor.position.y = -2;
             floor.receiveShadow = true;
             scene.add(floor);
-
-            // Ambient particles
-            const particleGeometry = new THREE.BufferGeometry();
-            const particleCount = 100;
-            const positions = new Float32Array(particleCount * 3);
-
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 40;
-                positions[i + 1] = Math.random() * 30;
-                positions[i + 2] = (Math.random() - 0.5) * 40;
-            }
-
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0x00ffff,
-                size: 0.15,
-                transparent: true,
-                opacity: 0.4
-            });
-
-            const particles = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particles);
         }
 
         function onMouseMove(event) {
@@ -485,7 +330,7 @@
                 resetObjectScale(gameState.hoveredObject);
                 gameState.hoveredObject.traverse(child => {
                     if (child.material) {
-                        child.material.emissiveIntensity = 0.2;
+                        child.material.color.setHex(0x333333);
                     }
                 });
                 gameState.hoveredObject = null;
@@ -499,10 +344,10 @@
 
                 if (object.userData.clickable) {
                     gameState.hoveredObject = object;
-                    object.scale.set(1.2, 1.2, 1.2);
+                    object.scale.set(1.15, 1.15, 1.15);
                     object.traverse(child => {
                         if (child.material) {
-                            child.material.emissiveIntensity = 0.6;
+                            child.material.color.setHex(0x000000);
                         }
                     });
                     document.body.style.cursor = 'pointer';
@@ -510,7 +355,7 @@
                 }
             }
 
-            document.body.style.cursor = gameState.isPlaying ? 'wait' : 'crosshair';
+            document.body.style.cursor = gameState.isPlaying ? 'wait' : 'default';
         }
 
         function onClick(event) {
@@ -534,15 +379,24 @@
 
         function playRound(playerChoice) {
             gameState.isPlaying = true;
-            document.getElementById('info').textContent = 'AI is choosing...';
 
             // Highlight player choice
-            highlightChoice(playerChoices[playerChoice], true);
+            playerChoices[playerChoice].traverse(child => {
+                if (child.material) {
+                    child.material.color.setHex(0x000000);
+                }
+            });
 
-            // Dim other player choices
+            // Dim other choices
             Object.entries(playerChoices).forEach(([type, obj]) => {
                 if (type !== playerChoice) {
-                    dimObject(obj);
+                    obj.traverse(child => {
+                        if (child.material) {
+                            child.material.color.setHex(0xcccccc);
+                            child.material.opacity = 0.3;
+                            child.material.transparent = true;
+                        }
+                    });
                 }
             });
 
@@ -553,18 +407,15 @@
 
                 // Show AI choice
                 aiChoices[aiChoice].visible = true;
-                highlightChoice(aiChoices[aiChoice], false);
-
-                // Animate AI choice appearing
                 aiChoices[aiChoice].scale.set(0, 0, 0);
-                animateScale(aiChoices[aiChoice], 0.7, 500);
+                animateScale(aiChoices[aiChoice], 0.8, 400);
 
                 setTimeout(() => {
                     // Determine winner
                     const result = determineWinner(playerChoice, aiChoice);
                     handleResult(result, playerChoice, aiChoice);
-                }, 800);
-            }, 1500);
+                }, 600);
+            }, 800);
         }
 
         function determineWinner(player, ai) {
@@ -583,22 +434,17 @@
             const resultEl = document.getElementById('result');
 
             if (result === 'player') {
-                resultEl.textContent = 'YOU WIN!';
+                resultEl.textContent = 'You Win';
                 resultEl.className = 'show win';
                 gameState.playerScore++;
-                createExplosion(playerChoices[playerChoice].position, 0x00ff00);
-                shakeObject(aiChoices[aiChoice]);
             } else if (result === 'ai') {
-                resultEl.textContent = 'AI WINS!';
+                resultEl.textContent = 'AI Wins';
                 resultEl.className = 'show lose';
                 gameState.aiScore++;
-                createExplosion(aiChoices[aiChoice].position, 0xff0000);
-                shakeObject(playerChoices[playerChoice]);
             } else {
-                resultEl.textContent = 'DRAW!';
+                resultEl.textContent = 'Draw';
                 resultEl.className = 'show draw';
                 gameState.drawScore++;
-                createExplosion(new THREE.Vector3(0, 2, 0), 0xffff00);
             }
 
             updateScore();
@@ -606,7 +452,7 @@
             setTimeout(() => {
                 resultEl.className = '';
                 resetRound();
-            }, 2500);
+            }, 1500);
         }
 
         function resetRound() {
@@ -620,39 +466,21 @@
                 resetObjectScale(obj);
                 obj.traverse(child => {
                     if (child.material) {
-                        child.material.emissiveIntensity = 0.2;
+                        child.material.color.setHex(0x333333);
                         child.material.opacity = 1;
+                        child.material.transparent = false;
                     }
                 });
             });
 
             gameState.isPlaying = false;
-            document.getElementById('info').textContent = 'Click on your choice to play!';
-        }
-
-        function highlightChoice(object, isPlayer) {
-            object.traverse(child => {
-                if (child.material) {
-                    child.material.emissiveIntensity = 0.8;
-                }
-            });
-        }
-
-        function dimObject(object) {
-            object.traverse(child => {
-                if (child.material) {
-                    child.material.emissiveIntensity = 0.05;
-                    child.material.opacity = 0.3;
-                    child.material.transparent = true;
-                }
-            });
         }
 
         function resetObjectScale(object) {
             if (object.userData.side === 'player') {
                 object.scale.set(1, 1, 1);
             } else {
-                object.scale.set(0.7, 0.7, 0.7);
+                object.scale.set(0.8, 0.8, 0.8);
             }
         }
 
@@ -663,80 +491,13 @@
             function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                const eased = 1 - Math.pow(1 - progress, 3);
 
                 const scale = startScale + (targetScale - startScale) * eased;
                 object.scale.set(scale, scale, scale);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
-                }
-            }
-
-            animate();
-        }
-
-        function shakeObject(object) {
-            const originalPos = object.position.clone();
-            const startTime = Date.now();
-            const duration = 500;
-            const intensity = 0.2;
-
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / duration;
-
-                if (progress < 1) {
-                    const shakeX = (Math.random() - 0.5) * intensity * (1 - progress);
-                    const shakeZ = (Math.random() - 0.5) * intensity * (1 - progress);
-                    object.position.x = originalPos.x + shakeX;
-                    object.position.z = originalPos.z + shakeZ;
-                    requestAnimationFrame(animate);
-                } else {
-                    object.position.copy(originalPos);
-                }
-            }
-
-            animate();
-        }
-
-        function createExplosion(position, color) {
-            const particleCount = 30;
-            const particles = [];
-
-            for (let i = 0; i < particleCount; i++) {
-                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
-                const material = new THREE.MeshBasicMaterial({ color: color });
-                const particle = new THREE.Mesh(geometry, material);
-
-                particle.position.copy(position);
-                particle.userData.velocity = new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.3,
-                    Math.random() * 0.3,
-                    (Math.random() - 0.5) * 0.3
-                );
-
-                scene.add(particle);
-                particles.push(particle);
-            }
-
-            const startTime = Date.now();
-            const duration = 1000;
-
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / duration;
-
-                if (progress < 1) {
-                    particles.forEach(p => {
-                        p.position.add(p.userData.velocity);
-                        p.userData.velocity.y -= 0.01; // Gravity
-                        p.material.opacity = 1 - progress;
-                        p.material.transparent = true;
-                    });
-                    requestAnimationFrame(animate);
-                } else {
-                    particles.forEach(p => scene.remove(p));
                 }
             }
 
@@ -758,22 +519,17 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // Gentle rotation of objects when not playing
+            // Very subtle rotation when idle
             if (!gameState.isPlaying) {
                 Object.values(playerChoices).forEach(obj => {
-                    obj.rotation.y += 0.005;
+                    obj.rotation.y += 0.003;
                 });
             }
 
             renderer.render(scene, camera);
         }
 
-        // Start button
-        document.getElementById('start-btn').addEventListener('click', () => {
-            document.getElementById('start-screen').style.display = 'none';
-        });
-
-        // Initialize
+        // Initialize immediately
         init();
     </script>
 </body>
