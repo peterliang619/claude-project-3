@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Monitor System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(to bottom, #0a0e27, #1a1e3f);
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .channel-list {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .channel-list h2 {
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ff00;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .channel-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0, 50, 0, 0.3);
+            border: 1px solid #005500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .channel-item:hover {
+            background: rgba(0, 100, 0, 0.4);
+            border-color: #00ff00;
+            transform: translateX(5px);
+        }
+
+        .channel-item.active {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .channel-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+
+        .monitor-display {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            min-height: 500px;
+        }
+
+        .monitor-header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .monitor-header h2 {
+            font-size: 1.8em;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .room-description {
+            color: #00dd00;
+            margin: 15px 0;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .status-item {
+            background: rgba(0, 50, 0, 0.3);
+            padding: 12px;
+            border: 1px solid #005500;
+            border-radius: 4px;
+        }
+
+        .status-label {
+            color: #00aa00;
+            font-size: 0.9em;
+        }
+
+        .status-value {
+            font-size: 1.2em;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .status-value.on {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .status-value.off {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .alert-box {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            padding: 15px;
+            margin: 20px 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .alert-box h3 {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+            margin-bottom: 5px;
+        }
+
+        .events-box {
+            margin-top: 20px;
+            background: rgba(0, 50, 0, 0.3);
+            padding: 15px;
+            border: 1px solid #005500;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .events-box h3 {
+            margin-bottom: 10px;
+            color: #00aa00;
+        }
+
+        .event-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #003300;
+            color: #00dd00;
+        }
+
+        .controls {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .controls h2 {
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: rgba(0, 100, 0, 0.4);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 150, 0, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.danger {
+            border-color: #ff0000;
+            color: #ff0000;
+            background: rgba(100, 0, 0, 0.4);
+        }
+
+        .control-btn.danger:hover {
+            background: rgba(150, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .welcome-content {
+            text-align: center;
+            padding: 40px;
+            border: 3px solid #00ff00;
+            background: rgba(0, 50, 0, 0.3);
+            max-width: 600px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+        }
+
+        .welcome-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #00ff00;
+        }
+
+        .welcome-content p {
+            margin: 15px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            background: rgba(0, 150, 0, 0.5);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            background: rgba(0, 200, 0, 0.6);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .game-over-content {
+            text-align: center;
+            padding: 40px;
+            border: 3px solid #00ff00;
+            background: rgba(0, 50, 0, 0.3);
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+        }
+
+        .game-over-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #00ff00;
+        }
+
+        .feedback-msg {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 0, 0.9);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 999;
+            animation: slideIn 0.5s ease-out;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <h1>🎮 SECURITY MONITOR SYSTEM</h1>
+            <p>Welcome, Security Officer!</p>
+            <p>Your job is to monitor multiple rooms via security channels.</p>
+            <p>Keep an eye on alerts, control room systems, and maintain security throughout the facility.</p>
+            <button class="start-btn" onclick="startGame()">BEGIN SHIFT</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <div class="game-over-content">
+            <h1>SHIFT ENDED</h1>
+            <p id="finalStats"></p>
+            <button class="start-btn" onclick="location.reload()">START NEW SHIFT</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎮 SECURITY MONITOR SYSTEM v2.0</h1>
+            <div class="header-stats">
+                <div class="stat">Time: <span id="gameTime">00:00</span></div>
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">Current Channel: <span id="currentChannel">1</span></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="channel-list">
+                <h2>AVAILABLE CHANNELS</h2>
+                <div id="channelList"></div>
+            </div>
+
+            <div class="monitor-display">
+                <div class="monitor-header">
+                    <h2 id="roomTitle">CHANNEL 1: MAIN OFFICE</h2>
+                </div>
+                <div class="room-description" id="roomDescription"></div>
+
+                <div class="status-grid" id="statusGrid"></div>
+
+                <div id="alertContainer"></div>
+
+                <div class="events-box">
+                    <h3>RECENT EVENTS</h3>
+                    <div id="eventsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h2>CONTROLS</h2>
+            <div class="button-grid">
+                <button class="control-btn" onclick="toggleLights()">💡 TOGGLE LIGHTS</button>
+                <button class="control-btn" onclick="toggleDoor()">🚪 TOGGLE DOOR</button>
+                <button class="control-btn" onclick="toggleCamera()">📹 TOGGLE CAMERA</button>
+                <button class="control-btn" onclick="advanceTime()">⏰ WAIT (Advance Time)</button>
+                <button class="control-btn danger" onclick="endGame()">❌ END SHIFT</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Room {
+            constructor(name, channel, description) {
+                this.name = name;
+                this.channel = channel;
+                this.description = description;
+                this.lightsOn = true;
+                this.doorLocked = false;
+                this.cameraActive = true;
+                this.temperature = Math.floor(Math.random() * 7) + 18;
+                this.motionDetected = false;
+                this.alert = null;
+                this.events = [];
+            }
+
+            toggleLights() {
+                this.lightsOn = !this.lightsOn;
+                const status = this.lightsOn ? "ON" : "OFF";
+                const msg = `Lights turned ${status} in ${this.name}`;
+                this.events.push(msg);
+                return msg;
+            }
+
+            toggleDoor() {
+                this.doorLocked = !this.doorLocked;
+                const status = this.doorLocked ? "LOCKED" : "UNLOCKED";
+                const msg = `Door ${status} in ${this.name}`;
+                this.events.push(msg);
+                return msg;
+            }
+
+            toggleCamera() {
+                this.cameraActive = !this.cameraActive;
+                const status = this.cameraActive ? "ACTIVE" : "INACTIVE";
+                const msg = `Camera ${status} in ${this.name}`;
+                this.events.push(msg);
+                return msg;
+            }
+        }
+
+        class MonitorSystem {
+            constructor() {
+                this.rooms = {};
+                this.currentChannel = 1;
+                this.gameTime = 0;
+                this.score = 0;
+                this.initializeRooms();
+            }
+
+            initializeRooms() {
+                this.rooms[1] = new Room(
+                    "Main Office",
+                    1,
+                    "A spacious office with desks and computers. The main hub of activity."
+                );
+
+                this.rooms[2] = new Room(
+                    "Storage Room",
+                    2,
+                    "Shelves stacked with supplies and equipment. Dimly lit and quiet."
+                );
+                this.rooms[2].lightsOn = false;
+
+                this.rooms[3] = new Room(
+                    "Research Lab",
+                    3,
+                    "High-tech laboratory with sensitive equipment. Temperature controlled."
+                );
+                this.rooms[3].doorLocked = true;
+                this.rooms[3].temperature = 20;
+
+                this.rooms[4] = new Room(
+                    "Hallway A",
+                    4,
+                    "Long corridor connecting different sections. Motion sensors installed."
+                );
+
+                this.rooms[5] = new Room(
+                    "Security Room",
+                    5,
+                    "Your current location. Banks of monitors and control panels."
+                );
+                this.rooms[5].doorLocked = true;
+            }
+
+            advanceTime() {
+                this.gameTime++;
+                this.triggerRandomEvents();
+                this.calculateScore();
+            }
+
+            triggerRandomEvents() {
+                // Random motion detection
+                Object.values(this.rooms).forEach(room => {
+                    if (Math.random() < 0.2) {
+                        room.motionDetected = !room.motionDetected;
+                        if (room.motionDetected && room !== this.rooms[5]) {
+                            room.events.push(`Motion detected at ${this.formatTime()}`);
+                        }
+                    }
+                });
+
+                // Random temperature changes
+                Object.values(this.rooms).forEach(room => {
+                    if (Math.random() < 0.3) {
+                        const change = Math.random() < 0.5 ? -1 : 1;
+                        room.temperature += change;
+                    }
+                });
+
+                // Special events
+                if (this.gameTime === 3 && !this.rooms[2].lightsOn) {
+                    this.rooms[2].alert = "Unusual activity detected in darkness";
+                    this.rooms[2].motionDetected = true;
+                }
+
+                if (this.gameTime === 5 && this.rooms[3].temperature > 22) {
+                    this.rooms[3].alert = "Temperature exceeds safe threshold!";
+                }
+
+                if (this.gameTime === 7 && !this.rooms[4].cameraActive) {
+                    this.rooms[4].alert = "Camera offline - security breach possible";
+                    this.rooms[4].motionDetected = true;
+                }
+
+                // Clear old alerts
+                if (this.gameTime > 10) {
+                    Object.values(this.rooms).forEach(room => {
+                        if (room.alert && Math.random() < 0.3) {
+                            room.alert = null;
+                        }
+                    });
+                }
+            }
+
+            calculateScore() {
+                let score = 0;
+                Object.values(this.rooms).forEach(room => {
+                    if (room.cameraActive) score += 10;
+                    if (!room.alert) score += 5;
+                    if (room.name === "Research Lab" && room.doorLocked) score += 15;
+                    if (room.name === "Research Lab" && room.temperature >= 19 && room.temperature <= 21) score += 10;
+                });
+                this.score = score;
+            }
+
+            formatTime() {
+                return `${String(this.gameTime).padStart(2, '0')}:00`;
+            }
+        }
+
+        let game;
+
+        function startGame() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            game = new MonitorSystem();
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const room = game.rooms[game.currentChannel];
+
+            // Update header
+            document.getElementById('gameTime').textContent = game.formatTime();
+            document.getElementById('score').textContent = game.score;
+            document.getElementById('currentChannel').textContent = game.currentChannel;
+
+            // Update room info
+            document.getElementById('roomTitle').textContent = `CHANNEL ${room.channel}: ${room.name.toUpperCase()}`;
+            document.getElementById('roomDescription').textContent = room.description;
+
+            // Update status grid
+            const statusGrid = document.getElementById('statusGrid');
+            statusGrid.innerHTML = `
+                <div class="status-item">
+                    <div class="status-label">LIGHTS</div>
+                    <div class="status-value ${room.lightsOn ? 'on' : 'off'}">${room.lightsOn ? 'ON' : 'OFF'}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">DOOR</div>
+                    <div class="status-value ${room.doorLocked ? 'on' : 'off'}">${room.doorLocked ? 'LOCKED' : 'UNLOCKED'}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">CAMERA</div>
+                    <div class="status-value ${room.cameraActive ? 'on' : 'off'}">${room.cameraActive ? 'ACTIVE' : 'INACTIVE'}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">TEMPERATURE</div>
+                    <div class="status-value on">${room.temperature}°C</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">MOTION</div>
+                    <div class="status-value ${room.motionDetected ? 'on' : 'off'}">${room.motionDetected ? 'DETECTED' : 'NONE'}</div>
+                </div>
+            `;
+
+            // Update alert
+            const alertContainer = document.getElementById('alertContainer');
+            if (room.alert) {
+                alertContainer.innerHTML = `
+                    <div class="alert-box">
+                        <h3>⚠️ ALERT</h3>
+                        <p>${room.alert}</p>
+                    </div>
+                `;
+            } else {
+                alertContainer.innerHTML = '';
+            }
+
+            // Update events
+            const eventsList = document.getElementById('eventsList');
+            const recentEvents = room.events.slice(-5).reverse();
+            eventsList.innerHTML = recentEvents.length > 0
+                ? recentEvents.map(event => `<div class="event-item">• ${event}</div>`).join('')
+                : '<div class="event-item">No events recorded</div>';
+
+            // Update channel list
+            updateChannelList();
+        }
+
+        function updateChannelList() {
+            const channelList = document.getElementById('channelList');
+            channelList.innerHTML = '';
+
+            Object.values(game.rooms).forEach(room => {
+                const div = document.createElement('div');
+                div.className = `channel-item ${room.channel === game.currentChannel ? 'active' : ''}`;
+                div.onclick = () => switchChannel(room.channel);
+
+                let indicators = '';
+                if (room.alert) indicators += '<span class="channel-indicator">⚠️</span>';
+                if (room.motionDetected) indicators += '<span class="channel-indicator">👁️</span>';
+
+                div.innerHTML = `[${room.channel}] ${room.name}${indicators}`;
+                channelList.appendChild(div);
+            });
+        }
+
+        function switchChannel(channel) {
+            game.currentChannel = channel;
+            updateDisplay();
+            showFeedback(`Switched to Channel ${channel}`);
+        }
+
+        function toggleLights() {
+            const room = game.rooms[game.currentChannel];
+            const msg = room.toggleLights();
+            showFeedback(msg);
+            updateDisplay();
+        }
+
+        function toggleDoor() {
+            const room = game.rooms[game.currentChannel];
+            const msg = room.toggleDoor();
+            showFeedback(msg);
+            updateDisplay();
+        }
+
+        function toggleCamera() {
+            const room = game.rooms[game.currentChannel];
+            const msg = room.toggleCamera();
+            showFeedback(msg);
+            updateDisplay();
+        }
+
+        function advanceTime() {
+            game.advanceTime();
+            showFeedback('Time advanced');
+            updateDisplay();
+        }
+
+        function showFeedback(message) {
+            const feedbackMsg = document.getElementById('feedbackMsg');
+            feedbackMsg.textContent = '✓ ' + message;
+            feedbackMsg.style.display = 'block';
+
+            setTimeout(() => {
+                feedbackMsg.style.display = 'none';
+            }, 2000);
+        }
+
+        function endGame() {
+            game.calculateScore();
+            const gameOver = document.getElementById('gameOver');
+            const finalStats = document.getElementById('finalStats');
+
+            finalStats.innerHTML = `
+                <p style="font-size: 1.2em; margin: 20px 0;">Time Worked: ${game.gameTime} hours</p>
+                <p style="font-size: 1.5em; margin: 20px 0; color: #00ff00; text-shadow: 0 0 10px #00ff00;">Final Score: ${game.score}</p>
+                <p>Thank you for keeping the facility safe!</p>
+            `;
+
+            gameOver.style.display = 'flex';
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('welcomeScreen').style.display !== 'none') return;
+            if (document.getElementById('gameOver').style.display === 'flex') return;
+
+            switch(e.key.toUpperCase()) {
+                case 'L':
+                    toggleLights();
+                    break;
+                case 'D':
+                    toggleDoor();
+                    break;
+                case 'C':
+                    toggleCamera();
+                    break;
+                case 'W':
+                    advanceTime();
+                    break;
+                case 'Q':
+                    endGame();
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                    switchChannel(parseInt(e.key));
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

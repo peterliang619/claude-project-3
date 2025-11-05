@@ -1,10 +1,26 @@
 # Security Monitor Game
 
-An interactive text-based security monitor game where you control various systems across multiple rooms through security channels.
+An interactive security monitor game where you control various systems across multiple rooms through security channels. Play directly in your web browser or via the command line!
 
 ## Overview
 
 You play as a security officer monitoring a facility through a multi-channel security system. Switch between different room cameras, control lights, doors, and security systems, and respond to various events and alerts.
+
+## 🌐 Play in Browser (Recommended)
+
+Simply open `index.html` in any modern web browser:
+
+1. **Open the file**: Double-click `index.html` or open it in your browser
+2. **Start playing**: Click "BEGIN SHIFT" to start
+3. **Use controls**: Click buttons or use keyboard shortcuts
+
+### Web Version Features
+- Beautiful retro security monitor aesthetic with green-on-black terminal styling
+- Scanline effects for authentic CRT monitor feel
+- Click buttons or use keyboard shortcuts (L, D, C, W, Q, 1-5)
+- Real-time visual feedback for all actions
+- Alert indicators and motion detection icons
+- Responsive design works on desktop and mobile
 
 ## Features
 
@@ -35,13 +51,7 @@ You play as a security officer monitoring a facility through a multi-channel sec
 
 ## How to Play
 
-### Starting the Game
-
-```bash
-python3 monitor_game.py
-```
-
-### Controls
+### Controls (Both Versions)
 
 - **[1-5]**: Switch between channels (rooms)
 - **[L]**: Toggle lights in current room
@@ -75,12 +85,19 @@ Your score is calculated based on:
 - Keep critical systems operational
 - Achieve the highest score possible
 
-## Requirements
+## 🖥️ Play in Terminal (Alternative)
 
+You can also play the text-based Python version in your terminal:
+
+```bash
+python3 monitor_game.py
+```
+
+### Requirements
 - Python 3.6 or higher
 - Works on Linux, macOS, and Windows
 
-## Example Gameplay
+## Example Gameplay (Terminal Version)
 
 ```
 ==============================================================
