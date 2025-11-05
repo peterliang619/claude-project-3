@@ -15,7 +15,7 @@
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden;
-            background: #f5f5f5;
+            background: #e0e0e0;
             color: #333;
         }
 
@@ -23,11 +23,11 @@
             position: fixed;
             width: 40px;
             height: 40px;
-            border: 1px solid #333;
+            border: 1.5px solid #333;
             border-radius: 50%;
             pointer-events: none;
             z-index: 10000;
-            transition: transform 0.15s ease-out, border-color 0.2s;
+            transition: transform 0.15s ease-out, border-color 0.2s, background-color 0.2s;
             transform: translate(-50%, -50%);
         }
 
@@ -36,20 +36,25 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 4px;
-            height: 4px;
+            width: 5px;
+            height: 5px;
             background: #333;
             border-radius: 50%;
             transform: translate(-50%, -50%);
+            transition: background-color 0.2s;
         }
 
         #cursor.hover {
             transform: translate(-50%, -50%) scale(1.5);
-            border-color: #000;
         }
 
-        #cursor.hover::after {
-            background: #000;
+        #cursor.invert {
+            border-color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #cursor.invert::after {
+            background: #fff;
         }
 
         #score {
@@ -164,7 +169,7 @@
         function init() {
             // Scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xf5f5f5);
+            scene.background = new THREE.Color(0xe0e0e0);
 
             // Camera
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -183,10 +188,10 @@
             mouse = new THREE.Vector2();
 
             // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
-            const mainLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.6);
             mainLight.position.set(8, 15, 8);
             mainLight.castShadow = true;
             mainLight.shadow.mapSize.width = 2048;
@@ -219,24 +224,75 @@
         }
 
         function createTable() {
-            // Simple table top
-            const topGeometry = new THREE.BoxGeometry(16, 0.3, 12);
+            // Main table top with depth
+            const topGeometry = new THREE.BoxGeometry(16, 0.8, 12);
             const topMaterial = new THREE.MeshLambertMaterial({
                 color: 0xffffff
             });
             const top = new THREE.Mesh(topGeometry, topMaterial);
-            top.position.y = 0;
+            top.position.y = -0.2;
             top.castShadow = true;
             top.receiveShadow = true;
             scene.add(top);
 
+            // Top surface - slightly raised
+            const surfaceGeometry = new THREE.BoxGeometry(15.8, 0.1, 11.8);
+            const surfaceMaterial = new THREE.MeshLambertMaterial({
+                color: 0xf8f8f8
+            });
+            const surface = new THREE.Mesh(surfaceGeometry, surfaceMaterial);
+            surface.position.y = 0.25;
+            surface.receiveShadow = true;
+            scene.add(surface);
+
+            // Table border/edge
+            const borderThickness = 0.15;
+            const borderHeight = 0.3;
+
+            // Create border segments
+            const borderMaterial = new THREE.MeshLambertMaterial({
+                color: 0xcccccc
+            });
+
+            // Top border
+            const borderTop = new THREE.Mesh(
+                new THREE.BoxGeometry(16.2, borderHeight, borderThickness),
+                borderMaterial
+            );
+            borderTop.position.set(0, 0.25, -6);
+            scene.add(borderTop);
+
+            // Bottom border
+            const borderBottom = new THREE.Mesh(
+                new THREE.BoxGeometry(16.2, borderHeight, borderThickness),
+                borderMaterial
+            );
+            borderBottom.position.set(0, 0.25, 6);
+            scene.add(borderBottom);
+
+            // Left border
+            const borderLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(borderThickness, borderHeight, 12),
+                borderMaterial
+            );
+            borderLeft.position.set(-8, 0.25, 0);
+            scene.add(borderLeft);
+
+            // Right border
+            const borderRight = new THREE.Mesh(
+                new THREE.BoxGeometry(borderThickness, borderHeight, 12),
+                borderMaterial
+            );
+            borderRight.position.set(8, 0.25, 0);
+            scene.add(borderRight);
+
             // Thin center line
-            const lineGeometry = new THREE.BoxGeometry(16, 0.02, 0.02);
+            const lineGeometry = new THREE.BoxGeometry(15.5, 0.03, 0.03);
             const lineMaterial = new THREE.MeshBasicMaterial({
                 color: 0xdddddd
             });
             const line = new THREE.Mesh(lineGeometry, lineMaterial);
-            line.position.y = 0.2;
+            line.position.y = 0.3;
             scene.add(line);
         }
 
@@ -353,13 +409,31 @@
         function createFloor() {
             const floorGeometry = new THREE.PlaneGeometry(100, 100);
             const floorMaterial = new THREE.MeshLambertMaterial({
-                color: 0xf5f5f5
+                color: 0xd0d0d0
             });
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
             floor.rotation.x = -Math.PI / 2;
             floor.position.y = -2;
             floor.receiveShadow = true;
             scene.add(floor);
+        }
+
+        function shouldInvertCursor(intersects) {
+            if (intersects.length === 0) return false;
+
+            // Check if hovering over dark objects
+            let object = intersects[0].object;
+
+            // Get material color
+            if (object.material && object.material.color) {
+                const color = object.material.color;
+                // Calculate luminance
+                const luminance = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
+                // Invert if dark (luminance < 0.5)
+                return luminance < 0.5;
+            }
+
+            return false;
         }
 
         function onMouseMove(event) {
@@ -370,6 +444,20 @@
             raycaster.setFromCamera(mouse, camera);
             const clickableObjects = Object.values(playerChoices);
             const intersects = raycaster.intersectObjects(clickableObjects, true);
+
+            // Check all objects for cursor inversion (not just clickable)
+            const allObjects = [
+                ...Object.values(playerChoices),
+                ...Object.values(aiChoices).filter(obj => obj.visible)
+            ];
+            const allIntersects = raycaster.intersectObjects(allObjects, true);
+
+            // Update cursor inversion based on what's underneath
+            if (shouldInvertCursor(allIntersects)) {
+                cursor.classList.add('invert');
+            } else {
+                cursor.classList.remove('invert');
+            }
 
             // Reset previous hover
             if (gameState.hoveredObject && !gameState.isPlaying) {
